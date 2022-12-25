@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-deploy
+  labels:
+    app: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      name: mysql-pod
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: database
+        image: mysql:5.7
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-admin-password
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-root-password
+        envFrom:
+          - configMapRef:
+              name: database-configmap
+        volumeMounts:
+        - name: phonebook-vol
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: phonebook-vol
+        persistentVolumeClaim:
+          claimName: phonebook-pv-claim
+
+          # env: 
+          # - name: MYSQL_ROOT_PASSWORD 
+          #   value: R1234r 
+          # - name: MYSQL_PASSWORD 
+          #   value: 1f2d1e2e67df 
+          # - name: MYSQL_USER 
+          #   value: ertugrul 
+          # - name: MYSQL_DATABASE 
+          #   value: phonebook-db
+
+      

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deploy
+  labels:
+    app: web-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-server
+  template:
+    metadata:
+      name: web-server
+      labels:
+        app: web-server
+    spec:
+      containers:
+        - name: web-server
+          image: eakkaya64/web-server
+          ports:
+          - containerPort: 80
+          env:
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: mysql-admin-password
+          envFrom:
+          - configMapRef:
+              name: servers-configmap
+
+        #   env: 
+        # - name: MYSQL_PASSWORD 
+        #   value: 1f2d1e2e67df 
+        # - name: MYSQL_USER 
+        #   value: ertugrul 
+        # - name: MYSQL_DATABASE 
+        #   value: phonebook-db 
+        # - name: MYSQL_DATABASE_HOST 
+        #   value: database-svc 

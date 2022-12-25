@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-deploy
+  labels:
+    app: result-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: search
+  template:
+    metadata:
+      name: search-pod
+      labels:
+        app: search
+    spec:
+      containers:
+      - name: result-server
+        image: eakkaya64/result-server
+        ports:
+        - containerPort: 80
+        env:
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-admin-password
+        envFrom:
+        - configMapRef:
+            name: servers-configmap
+
+        #   env: 
+        # - name: MYSQL_PASSWORD 
+        #   value: 1f2d1e2e67df 
+        # - name: MYSQL_USER 
+        #   value: ertugrul 
+        # - name: MYSQL_DATABASE 
+        #   value: phonebook-db 
+        # - name: MYSQL_DATABASE_HOST 
+        #   value: database-svc 
